@@ -111,3 +111,7 @@ venv.bak/
 
 # Documentation
 docbuild/
+
+# Scalability POCs
+fairlearn-dask/*
+fairlearn-hyperdrive/*
