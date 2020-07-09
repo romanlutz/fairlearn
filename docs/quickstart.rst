@@ -61,20 +61,29 @@ For this example we use the
 objective is to predict whether a person makes more (label 1) or less (0)
 than $50,000 a year.
 
+.. raw:: html
+   :file: _templates/thebelab.html
+
+.. thebe-button:: Connect to Binder
+
 .. doctest:: quickstart
 
-    >>> import numpy as np 
-    >>> import pandas as pd
-    >>> import matplotlib.pyplot as plt 
-    >>> from fairlearn.datasets import fetch_adult
-    >>> data = fetch_adult(as_frame=True)
-    >>> X = pd.get_dummies(data.data)
-    >>> y_true = (data.target == '>50K') * 1
-    >>> sex = data.data['sex']
-    >>> sex.value_counts()
-    Male      32650
-    Female    16192
-    Name: sex, dtype: int64
+.. code-block::
+    :class: thebe, thebe-init
+
+    import numpy as np 
+    import pandas as pd
+    import matplotlib.pyplot as plt 
+    from fairlearn.datasets import fetch_adult
+    data = fetch_adult(as_frame=True)
+    X = pd.get_dummies(data.data)
+    y_true = (data.target == '>50K') * 1
+    sex = data.data['sex']
+    sex.value_counts()
+
+Male      32650
+Female    16192
+Name: sex, dtype: int64
 
 .. figure:: auto_examples/quickstart/images/sphx_glr_plot_adult_dataset_001.png
    :target: auto_examples/quickstart/plot_adult_dataset.html

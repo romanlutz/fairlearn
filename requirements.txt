@@ -38,3 +38,4 @@ nbval
 sphinx
 sphinx-gallery
 pydata-sphinx-theme
+sphinx-thebelab

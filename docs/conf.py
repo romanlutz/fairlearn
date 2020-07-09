@@ -45,7 +45,8 @@ extensions = [
     'sphinx.ext.linkcode',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
-    'sphinx_gallery.gen_gallery'
+    'sphinx_gallery.gen_gallery',
+    'sphinx_thebelab'
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
@@ -165,5 +166,13 @@ mathjax_config = {
             "P": '{\\mathbb{P}}',
             "given": '\\mathbin{\\vert}'
         }
+    }
+}
+
+thebe_config = {
+    "binderOptions": {
+        "repo": 'fairlearn/fairlearn',
+        "ref": 'master',
+        "repoProvider": 'github',
     }
 }
