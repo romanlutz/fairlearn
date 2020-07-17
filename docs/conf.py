@@ -46,7 +46,8 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
     'sphinx_gallery.gen_gallery',
-    'sphinx_thebelab'
+    # 'sphinx_thebelab',
+    'jupyter_sphinx.execute'
 ]
 
 intersphinx_mapping = {'python3': ('https://docs.python.org/3', None),
@@ -169,10 +170,11 @@ mathjax_config = {
     }
 }
 
-thebe_config = {
+# -- Jupyter sphinx thebelab configuration -----------------------------------
+
+jupyter_sphinx_thebelab_config = {
     "binderOptions": {
-        "repo": 'fairlearn/fairlearn',
-        "ref": 'master',
-        "repoProvider": 'github',
+        "repo": "fairlearn/fairlearn",
+        "ref": "master",
     }
 }

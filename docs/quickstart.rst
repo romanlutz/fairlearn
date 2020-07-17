@@ -61,15 +61,10 @@ For this example we use the
 objective is to predict whether a person makes more (label 1) or less (0)
 than $50,000 a year.
 
-.. raw:: html
-   :file: _templates/thebelab.html
 
 .. thebe-button:: Connect to Binder
 
-.. doctest:: quickstart
-
-.. code-block::
-    :class: thebe, thebe-init
+.. jupyter-execute::
 
     import numpy as np 
     import pandas as pd
@@ -81,14 +76,26 @@ than $50,000 a year.
     sex = data.data['sex']
     sex.value_counts()
 
-Male      32650
-Female    16192
-Name: sex, dtype: int64
+.. jupyter-execute::
+    :hide:
 
-.. figure:: auto_examples/quickstart/images/sphx_glr_plot_adult_dataset_001.png
-   :target: auto_examples/quickstart/plot_adult_dataset.html
-   :align: center
-   :scale: 70%
+    from fairlearn.datasets import fetch_adult
+    import matplotlib.pyplot as plt
+
+    data = fetch_adult(as_frame=True)
+    X = data.data
+    y_true = (data.target == '>50K') * 1
+    sex = X['sex']
+
+    def percentage_with_label_1(sex_value):
+        return y_true[sex == sex_value].sum() / (sex == sex_value).sum()
+
+    plt.bar([0, 1], [percentage_with_label_1("Female"), percentage_with_label_1("Male")], color='g')
+    plt.xticks([0, 1], ["Female", "Male"])
+    plt.ylabel("percentage earning over $50,000")
+    plt.xlabel("sex")
+    plt.show()
+
 
 Evaluating fairness-related metrics
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -99,38 +106,39 @@ definitions from
 `scikit-learn <https://scikit-learn.org/stable/modules/classes.html#module-sklearn.metrics>`_
 we can evaluate metrics to get a group summary as below:
 
-.. doctest:: quickstart
+.. jupyter-execute::
 
-    >>> from fairlearn.metrics import group_summary
-    >>> from sklearn.metrics import accuracy_score
-    >>> from sklearn.tree import DecisionTreeClassifier
-    >>> 
-    >>> classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
-    >>> classifier.fit(X, y_true)
-    DecisionTreeClassifier(...)
-    >>> y_pred = classifier.predict(X)
-    >>> group_summary(accuracy_score, y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.844..., 'by_group': {'Female': 0.925..., 'Male': 0.804...}}
+    from fairlearn.metrics import group_summary
+    from sklearn.metrics import accuracy_score
+    from sklearn.tree import DecisionTreeClassifier
+    
+    classifier = DecisionTreeClassifier(min_samples_leaf=10, max_depth=4)
+    classifier.fit(X, y_true)
+    y_pred = classifier.predict(X)
+    group_summary(accuracy_score, y_true, y_pred, sensitive_features=sex)
+
+{'overall': 0.844..., 'by_group': {'Female': 0.925..., 'Male': 0.804...}}
 
 Additionally, Fairlearn has lots of other standard metrics built-in, such as
 selection rate, i.e., the percentage of the population with label 1:
 
-.. doctest:: quickstart
+.. jupyter-execute::
 
-    >>> from fairlearn.metrics import selection_rate_group_summary
-    >>> selection_rate_group_summary(y_true, y_pred, sensitive_features=sex)
-    {'overall': 0.163..., 'by_group': {'Female': 0.063..., 'Male': 0.213...}}
+    from fairlearn.metrics import selection_rate_group_summary
+    selection_rate_group_summary(y_true, y_pred, sensitive_features=sex)
+
+{'overall': 0.163..., 'by_group': {'Female': 0.063..., 'Male': 0.213...}}
 
 For a visual representation of the metrics try out the Fairlearn dashboard.
 While this page shows only screenshots, the actual dashboard is interactive.
 
-.. doctest:: quickstart
+.. jupyter-execute::
 
-    >>> from fairlearn.widget import FairlearnDashboard
-    >>> FairlearnDashboard(sensitive_features=sex,
-    ...                    sensitive_feature_names=['sex'],
-    ...                    y_true=y_true,
-    ...                    y_pred={"initial model": y_pred}) # doctest: +SKIP
+    from fairlearn.widget import FairlearnDashboard
+    FairlearnDashboard(sensitive_features=sex,
+                       sensitive_feature_names=['sex'],
+                       y_true=y_true,
+                       y_pred={"initial model": y_pred}) # doctest: +SKIP
 
 .. image:: ../img/fairlearn-dashboard-start.png
 
