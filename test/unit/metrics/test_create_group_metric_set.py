@@ -1,9 +1,11 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 import pytest
 
-from fairlearn.metrics import accuracy_score_group_summary, roc_auc_score_group_summary
+import sklearn.metrics as skm
+
+from fairlearn.metrics import MetricFrame
 from fairlearn.metrics._group_metric_set import _process_predictions
 from fairlearn.metrics._group_metric_set import _process_sensitive_features
 from fairlearn.metrics._group_metric_set import _create_group_metric_set
@@ -181,8 +183,10 @@ class TestCreateGroupMetricSet:
         y_p = [1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0]
         s_f = [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1]
 
-        exp_acc = accuracy_score_group_summary(y_t, y_p, sensitive_features=s_f)
-        exp_roc = roc_auc_score_group_summary(y_t, y_p, sensitive_features=s_f)
+        expected = MetricFrame({'accuracy_score': skm.accuracy_score,
+                                'roc_auc_score': skm.roc_auc_score},
+                               y_t, y_p,
+                               sensitive_features=s_f)
 
         predictions = {"some model": y_p}
         sensitive_feature = {"my sf": s_f}
@@ -197,14 +201,14 @@ class TestCreateGroupMetricSet:
         assert actual['trueY'] == y_t
         assert actual['predictedY'][0] == y_p
         assert actual['precomputedFeatureBins'][0]['binVector'] == s_f
-        assert len(actual['precomputedMetrics'][0][0]) == 10
+        assert len(actual['precomputedMetrics'][0][0]) == 11
 
         # Cross check the two metrics we computed
         # Comparisons simplified because s_f was already {0,1}
         actual_acc = actual['precomputedMetrics'][0][0]['accuracy_score']
-        assert actual_acc['global'] == exp_acc.overall
-        assert actual_acc['bins'] == list(exp_acc.by_group.values())
+        assert actual_acc['global'] == expected.overall['accuracy_score']
+        assert actual_acc['bins'] == list(expected.by_group['accuracy_score'])
 
         actual_roc = actual['precomputedMetrics'][0][0]['balanced_accuracy_score']
-        assert actual_roc['global'] == exp_roc.overall
-        assert actual_roc['bins'] == list(exp_roc.by_group.values())
+        assert actual_roc['global'] == expected.overall['roc_auc_score']
+        assert actual_roc['bins'] == list(expected.by_group['roc_auc_score'])

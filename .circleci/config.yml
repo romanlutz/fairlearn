@@ -17,16 +17,20 @@ jobs:
       - checkout
 
       - run:
+          name: Install pandoc
+          command: sudo apt-get install pandoc pandoc-citeproc
+
+      - run:
           name: Upgrade pip, setuptools, and wheel before installing other dependencies
           command: sudo python -m pip install --upgrade pip setuptools wheel
       
       - run:
           name: 'Install required packages'
-          command: sudo pip install -r requirements.txt
-      
+          command: sudo python scripts/install_requirements.py --pinned False
+
       - run:
-          name: 'Build'
-          command: python -m sphinx -b html -j auto docs docs/_build/html
+          name: "Build Documentation"
+          command: python scripts/build_documentation.py --documentation-path=docs --output-path=docs/_build/html
 
       - persist_to_workspace:
           root: docs/_build
@@ -35,6 +39,31 @@ jobs:
       # additionally store artifacts to make them viewable in the CircleCI UX
       - store_artifacts:
           path: docs/_build/html
+
+  build-doctest:
+    docker:
+      - image: circleci/python:3.7.3-stretch
+
+    working_directory: ~/tmp-fairlearn
+    steps:
+      # check out PR branch
+      - checkout
+      
+      - run:
+          name: Install pandoc
+          command: sudo apt-get install pandoc pandoc-citeproc
+
+      - run:
+          name: Upgrade pip, setuptools, and wheel before installing other dependencies
+          command: sudo python -m pip install --upgrade pip setuptools wheel
+      
+      - run:
+          name: 'Install required packages'
+          command: sudo python scripts/install_requirements.py --pinned False
+      
+      - run:
+          name: 'Build doctest'
+          command: python -m sphinx -v -b doctest -n -j auto docs docs/_build/html
       
   deploy-doc:
     docker:
@@ -80,6 +109,7 @@ workflows:
   build-webpage:
     jobs:
       - build-doc
+      - build-doctest
       - deploy-doc:
           requires:
             - build-doc

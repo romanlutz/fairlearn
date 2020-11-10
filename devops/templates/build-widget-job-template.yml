@@ -11,6 +11,11 @@ jobs:
     vmImage: ${{ parameters.vmImage }}
 
   steps:
-  # TODO: add --assert-no-changes to validate that no changes happened to widget files (Issue #270)
+  - bash: |
+      cd ./visualization/FairnessDashboard
+      yarn lintci
+      cd ../..
+    displayName: "Run visualization linter"
+
   - script: python ./scripts/build_widget.py --yarn-path /usr/bin/yarn
     displayName: 'Build widget'

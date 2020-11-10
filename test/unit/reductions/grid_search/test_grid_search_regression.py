@@ -1,8 +1,8 @@
-# Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation and Fairlearn contributors.
 # Licensed under the MIT License.
 
 from fairlearn.reductions import GridSearch
-from fairlearn.reductions import GroupLossMoment
+from fairlearn.reductions import BoundedGroupLoss
 from fairlearn.reductions import SquareLoss, ZeroOneLoss
 
 import copy
@@ -61,7 +61,7 @@ def test_bgl_unfair(A_two_dim):
                                       a0_factor, a1_factor,
                                       a0_label, a1_label, A_two_dim)
 
-    bgl_square_loss = GroupLossMoment(SquareLoss(-np.inf, np.inf))
+    bgl_square_loss = BoundedGroupLoss(SquareLoss(-np.inf, np.inf))
     grid_search = GridSearch(LinearRegression(),
                              constraints=bgl_square_loss,
                              grid_size=grid_size)
@@ -77,7 +77,7 @@ def test_bgl_unfair(A_two_dim):
     best_predict = grid_search.predict(test_X)
     assert np.allclose([-1.91764706,  9.61176471], best_predict)
 
-    all_predict = [predictor.predict(test_X) for predictor in grid_search._predictors]
+    all_predict = [predictor.predict(test_X) for predictor in grid_search.predictors_]
 
     # TODO: investigate where the different outcomes for the first grid point are from, likely
     # due to some ignored data points at the edge resulting in another solution with the same
@@ -123,12 +123,12 @@ def test_bgl_unmitigated_same(A_two_dim):
     grid_df = pd.DataFrame(lagrange_balanced_series)
 
     grid_search = GridSearch(estimator,
-                             constraints=GroupLossMoment(ZeroOneLoss()),
+                             constraints=BoundedGroupLoss(ZeroOneLoss()),
                              grid=grid_df)
     grid_search.fit(X, y, sensitive_features=A)
 
     raw_coef = unmitigated_estimator.coef_
-    gs_coef = grid_search._predictors[grid_search._best_grid_index].coef_
+    gs_coef = grid_search.predictors_[grid_search.best_idx_].coef_
     # Can't quite get exact match, but this should be very close
     assert np.allclose(raw_coef, gs_coef, rtol=1e-10, atol=1e-7)
 
@@ -167,11 +167,11 @@ def test_bgl_lagrange_specifications(A_two_dim):
                         axis=1)
 
     grid_search1 = GridSearch(copy.deepcopy(estimator),
-                              constraints=GroupLossMoment(ZeroOneLoss()),
+                              constraints=BoundedGroupLoss(ZeroOneLoss()),
                               grid_size=5)
 
     grid_search2 = GridSearch(copy.deepcopy(estimator),
-                              constraints=GroupLossMoment(ZeroOneLoss()),
+                              constraints=BoundedGroupLoss(ZeroOneLoss()),
                               grid=grid_df)
 
     tradeoffs = [0, 0.25, 0.5, 0.75, 1]
@@ -184,12 +184,12 @@ def test_bgl_lagrange_specifications(A_two_dim):
 
     # Check we generated the same multipliers
     for i in range(len(tradeoffs)):
-        lm1 = grid_search1._lambda_vecs[i]
-        lm2 = grid_search2._lambda_vecs[i]
+        lm1 = grid_search1.lambda_vecs_[i]
+        lm2 = grid_search2.lambda_vecs_[i]
         assert lm1.equals(lm2)
 
     # Check the models are the same
     for i in range(len(tradeoffs)):
-        coef1 = grid_search1._predictors[i].coef_
-        coef2 = grid_search2._predictors[i].coef_
+        coef1 = grid_search1.predictors_[i].coef_
+        coef2 = grid_search2.predictors_[i].coef_
         assert np.array_equal(coef1, coef2)
