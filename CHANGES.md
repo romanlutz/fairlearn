@@ -1,13 +1,20 @@
 # Changes
 
-### v0.5.1
+### v0.6.1
 
+* Add plotting functionality to `fairlearn.metrics` module, with
+  `plot_disparities_in_performance` and `plot_disparities_in_metric` functions
+
+### v0.6.0
+
+* Add `CorrelationRemover` preprocessing technique. This removes correlations
+  between sensitive and non-sensitive features while retaining as much information
+  as possible
 * Add `control_features` to the classification moments. These allow for data
   stratification, with fairness constraints enforced within each stratum, but
   not between strata
 * Update `make_derived_metric()` to use `MetricFrame`
-* Add plotting functionality to `fairlearn.metrics` module, with
-  `plot_disparities_in_performance` and `plot_disparities_in_metric` functions
+* Assorted small documentation fixes
 
 ### v0.5.0
 

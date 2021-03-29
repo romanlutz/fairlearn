@@ -90,8 +90,8 @@ master_doc = 'index'
 
 # Multiversion settings
 
-smv_tag_whitelist = r'^v0\.4\.6|^v0\.5\.\d+$'
-smv_branch_whitelist = r'^master$'
+smv_tag_whitelist = r'^v0\.4\.6|^v0\.5\.\d|^v0\.6\.\d+$'
+smv_branch_whitelist = r'^main$'
 
 if check_if_v046():
     print("Current version is v0.4.6, will apply overrides")
@@ -108,6 +108,7 @@ html_theme = 'pydata_sphinx_theme'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
+    "logo_link": "https://fairlearn.org",
     # TODO: fork the pydata-sphinx-theme to integrate these with logo
     "external_links": [
         {"name": "Gitter", "url": "https://gitter.im/fairlearn/community"},
@@ -202,7 +203,7 @@ def linkcode_resolve(domain, info):
     else:
         linespec = ""
 
-    tag_or_branch = os.getenv("SPHINX_MULTIVERSION_NAME", default="master")
+    tag_or_branch = os.getenv("SPHINX_MULTIVERSION_NAME", default="main")
     fn = os.path.relpath(fn, start=os.path.dirname(fairlearn.__file__)).replace(os.sep, '/')
     return f"http://github.com/fairlearn/fairlearn/blob/{tag_or_branch}/fairlearn/{fn}{linespec}"
 
