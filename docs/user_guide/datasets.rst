@@ -20,10 +20,11 @@ We also think this dataset provides an interesting case study of how fairness is
 socio-technical issue by exploring how societal biases manifest in data in ways that can't
 simply be fixed with technical mitigation approaches (although the harms they engender may be mitigated).
 This article has the following goals:
-  * Educate users about the history of the dataset and how the variables were constructed
-  * Show users how socioeconomic inequities are reflected in the data in ways that 
+
+* Educate users about the history of the dataset and how the variables were constructed
+* Show users how socioeconomic inequities are reflected in the data in ways that
   can potentially lead to fairness-related harms in downstream modelling tasks
-  * Suggest alternative benchmarking datasets
+* Suggest alternative benchmarking datasets
 
 
 .. _boston_dataset_origin:
@@ -63,7 +64,7 @@ indexed in the `University of California-Irvine Machine Learning Repository
 <https://archive.ics.uci.edu/ml/machine-learning-databases/housing/>`_ and in 
 Carnegie Mellon University's `StatLib <http://lib.stat.cmu.edu/datasets/boston>`_, 
 and for a time was included as one of scikit-learn's and tensorflow's standard toy datasets
-(see :func:`tf.keras.datasets.boston_housing`). 
+(see :mod:`tf.keras.datasets.boston_housing`).
 It has also been the benchmark of choice for many machine learning 
 `papers <https://arxiv.org/search/?query=boston+housing&searchtype=all>`_ [#2]_ [#3]_ [#4]_.
 In 2020, users brought the dataset's fairness issues to the scikit-learn development team 
@@ -72,24 +73,41 @@ In scikit-learn version 1.2, the dataset will be removed.
 
 The dataset contains the following columns:
 
-============ ==========================================================================
-Column Name   Description                                                              
-============ ==========================================================================
-CRIM         per capita crime rate by town                                         
-ZN           proportion of residential land zoned for lots over 25,000 sq.ft.
-INDUS        proportion of non-retail business acres per town
-CHAS         Charles River dummy variable (= 1 if tract bounds river; 0 otherwise)
-NOX          nitric oxides concentration (parts per 10 million)
-RM           average number of rooms per dwelling
-AGE          proportion of owner-occupied units built prior to 1940
-DIS          weighted distances to five Boston employment centers
-RAD          index of accessibility to radial highways
-TAX          full-value property-tax rate per $10,000
-PTRATIO      pupil-teacher ratio by town
-B            1000(Bk - 0.63)^2 where Bk is the proportion of Black people by town
-LSTAT        % lower status of the population
-MEDV         Median value of owner-occupied homes in $1000’s
-============ ============================================================================
+.. list-table::
+   :header-rows: 1
+   :widths: 7 30
+   :stub-columns: 1
+
+   *  - Column name
+      - Description
+   *  - CRIM
+      - per capita crime rate by town
+   *  - ZN
+      - proportion of residential land zoned for lots over 25,000 sq.ft.
+   *  - INDUS
+      - proportion of non-retail business acres per town
+   *  - CHAS
+      - Charles River dummy variable (= 1 if tract bounds river; 0 otherwise)
+   *  - NOX
+      - nitric oxides concentration (parts per 10 million)
+   *  - RM
+      - average number of rooms per dwelling
+   *  - AGE
+      - proportion of owner-occupied units built prior to 1940
+   *  - DIS
+      - weighted distances to five Boston employment centers
+   *  - RAD
+      - index of accessibility to radial highways
+   *  - TAX
+      - full-value property-tax rate per $10,000
+   *  - PTRATIO
+      - pupil-teacher ratio by town
+   *  - B
+      - 1000(Bk - 0.63)^2 where Bk is the proportion of Black people by town
+   *  - LSTAT
+      - % lower status of the population
+   *  - MEDV
+      - Median value of owner-occupied homes in $1000’s
 
 The cells below show basic summary statistics about the data, the data types of the 
 columns, and the number of missing values.
@@ -117,23 +135,15 @@ visit :mod:`fairlearn.datasets`.
     >>> pd.set_option('display.width', 80)
     >>> X, y = fetch_boston(as_frame=True, return_X_y=True)
     >>> boston_housing=pd.concat([X, y], axis=1)
-    >>> boston_housing.head()
-               CRIM    ZN  INDUS CHAS    NOX     RM   AGE     DIS RAD    TAX  PTRATIO  \
-        0  0.00632  18.0   2.31    0  0.538  6.575  65.2  4.0900   1  296.0     15.3   
-        1  0.02731   0.0   7.07    0  0.469  6.421  78.9  4.9671   2  242.0     17.8   
-        2  0.02729   0.0   7.07    0  0.469  7.185  61.1  4.9671   2  242.0     17.8   
-        3  0.03237   0.0   2.18    0  0.458  6.998  45.8  6.0622   3  222.0     18.7   
-        4  0.06905   0.0   2.18    0  0.458  7.147  54.2  6.0622   3  222.0     18.7   
+    >>> with pd.option_context('expand_frame_repr', False):
+    ...    boston_housing.head()
+          CRIM    ZN  INDUS CHAS    NOX     RM   AGE     DIS RAD    TAX  PTRATIO       B  LSTAT  MEDV
+    0  0.00632  18.0   2.31    0  0.538  6.575  65.2  4.0900   1  296.0     15.3   396.90   4.98  24.0
+    1  0.02731   0.0   7.07    0  0.469  6.421  78.9  4.9671   2  242.0     17.8   396.90   9.14  21.6
+    2  0.02729   0.0   7.07    0  0.469  7.185  61.1  4.9671   2  242.0     17.8   392.83   4.03  34.7
+    3  0.03237   0.0   2.18    0  0.458  6.998  45.8  6.0622   3  222.0     18.7   394.63   2.94  33.4
+    4  0.06905   0.0   2.18    0  0.458  7.147  54.2  6.0622   3  222.0     18.7   396.90   5.33  36.2
 
-                B  LSTAT  MEDV  
-        0  396.90   4.98  24.0  
-        1  396.90   9.14  21.6  
-        2  392.83   4.03  34.7  
-        3  394.63   2.94  33.4  
-        4  396.90   5.33  36.2  
-       <BLANKLINE>
-       [5 rows x 14 columns]
-    
 .. _boston_dataset_issues:
 
 Dataset Issues
@@ -154,17 +164,17 @@ are verbatim from their paper). However, many of the authors' assumptions
 have later been found to be unsubstantiated.
 
 * *LSTAT*: "Proportion of population that is lower status = 0.5 * 
-(proportion of adults without some high school education and proportion of 
-male workers classified as laborers). The logarithmic specification implies 
-that socioeconomic status distinctions mean more in the upper brackets of 
-society than in the lower classes."
+  (proportion of adults without some high school education and proportion of
+  male workers classified as laborers). The logarithmic specification implies
+  that socioeconomic status distinctions mean more in the upper brackets of
+  society than in the lower classes."
 
 * *B*: "Proportion of population that is Black. At low to moderate levels of B, 
-an increase in B should have a negative influence on housing value 
-if Black people are regarded as undesirable neighbors by White people. However, market 
-discrimination means that housing values are higher at very high levels of B. 
-One expects, therefore, a parabolic relationship between proportion Black in 
-a neighborhood and housing values."
+  an increase in B should have a negative influence on housing value
+  if Black people are regarded as undesirable neighbors by White people. However, market
+  discrimination means that housing values are higher at very high levels of B.
+  One expects, therefore, a parabolic relationship between proportion Black in
+  a neighborhood and housing values."
 
 To describe the reasoning behind *B* further, the authors assume that 
 self-segregation correlates to higher home values. However, other 
