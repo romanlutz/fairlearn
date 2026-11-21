@@ -251,14 +251,24 @@ To run the same tests locally, find the corresponding pipeline definition (a
 the command to execute the tests (usually starting with
 :code:`python -m pytest`) or it refers to a template file with the command.
 
-Maintaining workflow dependencies
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Maintaining development and workflow dependencies
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``.github/dependabot.yml`` schedules weekly GitHub Actions update proposals.
-Minor and patch updates are grouped; major updates are proposed separately.
-The configuration limits open version-update pull requests to three for this
-ecosystem, not including security-update pull requests. Maintainers review and
-merge updates manually.
+``.github/dependabot.yml`` schedules weekly update proposals for GitHub Actions
+and uv development dependencies. Minor and patch updates are grouped separately
+for Actions, testing, documentation, and tooling; major updates are proposed
+individually. Each ecosystem allows three open version-update pull requests,
+for up to six in total, not including security-update pull requests.
+Maintainers review and merge updates manually.
+
+The uv entry maintains development dependencies in ``pyproject.toml`` and their
+resolved versions in ``uv.lock``. Requirements are changed only when necessary
+to admit an update. Dependencies also declared as runtime requirements are
+excluded, and ``requirements-min.txt`` is excluded entirely. Lock resolution may
+still change shared or transitive dependencies within the existing supported
+ranges, so review lockfile changes and run the appropriate compatibility checks.
+The build-system ``setuptools`` requirement is maintained manually to preserve
+its supported lower bound; the ``build`` tool is updated in the tooling group.
 
 External Actions are pinned to full commit SHAs, with comments recording their
 version refs. Preserve both when updating an Action, and verify that the commit
@@ -269,11 +279,12 @@ PyPI API-token authentication.
 
 Updating ``astral-sh/ruff-action`` does not update the Ruff tool itself. Keep the
 development Ruff requirement, its pre-commit revision, and both lint and format
-workflow version inputs synchronized in a separate change. Minimum-dependency
-fixtures must not be routinely raised by dependency automation.
+workflow version inputs synchronized in a separate change, updating ``uv.lock``
+alongside them. Ruff package updates are excluded from Dependabot until these
+surfaces can be synchronized reliably. Hook revisions remain manually
+maintained; updating the ``pre-commit`` package does not update hook revisions.
+Minimum-dependency fixtures must not be routinely raised by dependency automation.
 
-Python update configuration will follow the uv dependency-group and lockfile
-migration rather than maintaining a second source of development requirements.
 Adding an active Dependabot configuration to the default branch enables version
 update proposals. Coordinate that rollout with maintainers; a configuration on
 a feature branch alone does not demonstrate that updates are running.

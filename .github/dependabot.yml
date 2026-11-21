@@ -12,3 +12,50 @@ updates:
         update-types:
           - minor
           - patch
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    versioning-strategy: increase-if-necessary
+    allow:
+      - dependency-type: development
+    exclude-paths:
+      - requirements-min.txt
+    ignore:
+      - dependency-name: ruff
+      - dependency-name: setuptools
+    groups:
+      testing:
+        patterns:
+          - "pytest*"
+          - matplotlib
+          - wheel
+          - lightgbm
+          - xlrd
+          - polars
+          - pyarrow
+        update-types:
+          - minor
+          - patch
+      documentation:
+        patterns:
+          - pypandoc
+          - "sphinx*"
+          - numpydoc
+          - pydata-sphinx-theme
+          - "jupyterlite*"
+          - packaging
+          - seaborn
+          - torch
+          - memory-profiler
+        update-types:
+          - minor
+          - patch
+      tooling:
+        patterns:
+          - build
+          - pre-commit
+        update-types:
+          - minor
+          - patch
