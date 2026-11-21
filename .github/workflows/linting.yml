@@ -24,6 +24,18 @@ jobs:
         with:
           version: 0.15.20
           args: "format --check --diff"
+  ty:
+    runs-on: ${{ inputs.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.0
+        with:
+          version: "0.13.9"
+          python-version: "3.11"
+      - name: Install typing dependencies
+        run: uv sync --locked --no-default-groups --group typing
+      - name: Check metrics types
+        run: uv run --locked --no-default-groups --group typing ty check
   build-wheel:
     runs-on: ${{ inputs.os }}
     steps:
