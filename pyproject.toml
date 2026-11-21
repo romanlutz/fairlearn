@@ -82,6 +82,10 @@ tooling = [
     "build",
     "pre-commit",
 ]
+typing = [
+    "ty==0.0.107",
+    "pandas-stubs==2.3.3.260113",
+]
 
 [tool.setuptools.dynamic]
 version = { attr = "fairlearn.__version__" }

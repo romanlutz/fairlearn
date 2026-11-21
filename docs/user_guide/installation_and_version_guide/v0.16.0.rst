@@ -127,6 +127,10 @@ Documentation
 Other improvements
 ------------------
 
+* Added incremental :code:`ty` type checking for three annotated metrics helpers,
+  with an opt-in typing dependency group and a blocking CI check. The initial
+  scope does not claim a complete public typing contract.
+
 * Standardized development environments on :code:`uv sync` and :code:`uv run`,
   with tests, docs, and tooling dependency groups and a committed development
   lockfile. Minimum, latest, minimal-installation, and nightly compatibility
