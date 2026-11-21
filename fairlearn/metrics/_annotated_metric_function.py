@@ -98,12 +98,13 @@ class AnnotatedMetricFunction(Generic[R]):
         expected types are passed to the underlying metric function.
         """
         df_nw = nw.from_native(df, eager_only=True, pass_through=False)
+        assert isinstance(df_nw, nw.DataFrame)
         args = [
-            np.stack(df_nw.get_column(arg_name).to_numpy())
+            np.stack(list(df_nw.get_column(arg_name).to_numpy()))
             for arg_name in self.postional_argument_names
         ]
         kwargs = {
-            func_arg_name: np.stack(df_nw.get_column(data_arg_name).to_numpy())
+            func_arg_name: np.stack(list(df_nw.get_column(data_arg_name).to_numpy()))
             for func_arg_name, data_arg_name in self.kw_argument_mapping.items()
         }
         return self.func(*args, **kwargs)

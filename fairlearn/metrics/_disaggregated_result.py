@@ -350,6 +350,7 @@ class DisaggregatedResult:
             grouping_names=(control_feature_names or []) + sensitive_feature_names,
         )
 
+        assert isinstance(by_group, pd.DataFrame)
         return DisaggregatedResult(overall, by_group)
 
     @staticmethod
@@ -390,7 +391,7 @@ class DisaggregatedResult:
 
         if len(grouping_names) > 1:
             all_indices = pd.MultiIndex.from_product(
-                [np.unique(data[col]) for col in grouping_names], names=grouping_names
+                [pd.Index(np.unique(data[col])) for col in grouping_names], names=grouping_names
             )
 
             return temp.reindex(index=all_indices)

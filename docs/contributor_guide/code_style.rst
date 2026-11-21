@@ -40,6 +40,43 @@ defined in the `pyproject.toml <https://github.com/fairlearn/fairlearn/blob/main
 The installation instructions are described in step 6
 of `"Contributing a Pull Request" <https://fairlearn.org/main/contributor_guide/development_process.html#contributing-a-pull-request>`_ .
 
+Type checking
+^^^^^^^^^^^^^
+
+We use ``ty`` for incremental static type checking, separately from Ruff's linting
+and formatting. From the repository root, install the runtime and typing dependencies
+and run the same check used in CI:
+
+.. code-block:: console
+
+   uv sync --locked --no-default-groups --group typing
+   uv run --locked --no-default-groups --group typing ty check
+
+The typing group is opt-in. These commands do not install the default development
+groups; use the development setup instructions when you also need tests or documentation.
+uv resolves all groups together, so typing dependencies must remain compatible with
+the documentation group's ``pandas<3`` requirement.
+
+The initial blocking scope contains three already-annotated metrics helpers:
+``_annotated_metric_function.py``, ``_bootstrap.py``, and ``_disaggregated_result.py``.
+The explicit file selection in ``[tool.ty.src]`` keeps local and CI checks aligned.
+Imports are still resolved, but a passing check does not mean that the rest of
+Fairlearn, dynamic estimator interfaces, or the public typing contract is verified.
+The language target is the minimum supported Python version, 3.11.
+
+The checker and pandas stubs are pinned in the typing group and resolved in ``uv.lock``.
+Refresh them deliberately, rerun the check and affected metrics tests, and investigate
+new diagnostics rather than disabling rules, ignoring unresolved imports, or adding
+blanket suppressions. Static checking uses the locked development dependencies;
+minimum-runtime compatibility remains covered by runtime tests, not by pairing current
+stubs with old pandas.
+
+Expand the scope one clean slice at a time, with useful annotations and focused runtime
+coverage: grouping and base metrics, then MetricFrame and derived metrics, followed by
+plotting and estimator interfaces. Preserve supported inputs and behavior when improving
+types. Do not publish ``py.typed`` until the public annotations provide a dependable
+typing contract.
+
 Considerations for new methods
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

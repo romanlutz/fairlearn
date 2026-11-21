@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import numbers
+from collections.abc import Sequence
 from functools import reduce
 
 import numpy as np
@@ -161,13 +162,20 @@ def _align_sample_indices(samples: list[pd.DataFrame]) -> list[pd.DataFrame]:
 
 
 def calculate_pandas_quantiles(
-    quantiles: list[float], bootstrap_samples: list[pd.Series] | list[pd.DataFrame]
+    quantiles: list[float], bootstrap_samples: Sequence[pd.Series | pd.DataFrame]
 ) -> list[pd.Series] | list[pd.DataFrame]:
     """Calculate quantiles for a list of pandas objects."""
     if isinstance(bootstrap_samples[0], pd.Series):
-        result = _calc_series_quantiles(quantiles=quantiles, samples=bootstrap_samples)
+        series_samples: list[pd.Series] = []
+        for sample in bootstrap_samples:
+            assert isinstance(sample, pd.Series)
+            series_samples.append(sample)
+        return _calc_series_quantiles(quantiles=quantiles, samples=series_samples)
     elif isinstance(bootstrap_samples[0], pd.DataFrame):
-        result = _calc_dataframe_quantiles(quantiles=quantiles, samples=bootstrap_samples)
+        dataframe_samples: list[pd.DataFrame] = []
+        for sample in bootstrap_samples:
+            assert isinstance(sample, pd.DataFrame)
+            dataframe_samples.append(sample)
+        return _calc_dataframe_quantiles(quantiles=quantiles, samples=dataframe_samples)
     else:
         raise AssertionError("Should not be possible to get here")
-    return result

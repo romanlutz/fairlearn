@@ -71,6 +71,16 @@ markers = [
     "openml: tests that download datasets from OpenML (deselect with '-m \"not openml\"')",
 ]
 
+[tool.ty.environment]
+python-version = "3.11"
+
+[tool.ty.src]
+include = [
+    "fairlearn/metrics/_annotated_metric_function.py",
+    "fairlearn/metrics/_bootstrap.py",
+    "fairlearn/metrics/_disaggregated_result.py",
+]
+
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
