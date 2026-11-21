@@ -1,4 +1,8 @@
 name: Check Changelog
+
+permissions:
+  contents: read
+
 # This check makes sure that the changelog is properly updated
 # when a PR introduces a change in a test file.
 # To bypass this check, label the PR with "No Changelog Needed".
@@ -16,7 +20,7 @@ jobs:
         run: |
           echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
           echo "TAGGED_MILESTONE=${{ github.event.pull_request.milestone.title }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: '0'
       - name: Check the changelog entry

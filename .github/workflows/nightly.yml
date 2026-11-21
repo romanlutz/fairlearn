@@ -1,5 +1,8 @@
 name: nightly
 
+permissions:
+  contents: read
+
 on:
   schedule:
     - cron: "0 8 * * *"

@@ -1,5 +1,8 @@
 name: Release Wheel
 
+permissions:
+  contents: read
+
 # Following will be changed in due course
 on:
   workflow_dispatch:
@@ -21,13 +24,13 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
     - name: Set up Python
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
       with:
         python-version: "3.11"
     - name: Set up uv
-      uses: astral-sh/setup-uv@v10.3.0
+      uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
     - name: Build wheels
       run: uv run --no-project --with build python ./scripts/build_wheels.py --version-filename "$VERSION_FILE_NAME"
     - name: Check distribution metadata
@@ -45,7 +48,7 @@ jobs:
             output.write(f"version={version}\n")
         PY
     - name: Save wheels to artifact
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
       with:
         name: ${{ env.WHEEL_ARTIFACT }}
         path: dist/
@@ -58,13 +61,13 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-15]
         python-version: ['3.11', '3.12', '3.13', '3.14']
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
     - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
       with:
         python-version: ${{ matrix.python-version }}
     - name: Set up uv
-      uses: astral-sh/setup-uv@v10.3.0
+      uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
     - name: Remove Fairlearn source directory
       shell: python
       run: |
@@ -72,7 +75,7 @@ jobs:
 
         shutil.rmtree("fairlearn")
     - name: Download wheel artifact
-      uses: actions/download-artifact@v8
+      uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
       with:
         name: ${{ env.WHEEL_ARTIFACT }}
     - name: Install Fairlearn from wheel
@@ -123,9 +126,10 @@ jobs:
   release-wheel:
     needs: test-wheel
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
     - name: Download wheel artifact
-      uses: actions/download-artifact@v8
+      uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
       with:
         name: ${{ env.WHEEL_ARTIFACT }}
         path: dist
@@ -141,7 +145,7 @@ jobs:
     #    attestations: false
     #    repository-url: https://test.pypi.org/legacy/
     - name: Release to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+      uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
         # Attestations require Trusted Publishing instead of API-token authentication.

@@ -1,5 +1,8 @@
 name: test-other-ml
 
+permissions:
+  contents: read
+
 on:
   workflow_call:
     inputs:
@@ -23,8 +26,8 @@ jobs:
       baseDir: test_othermlpackages
       condaEnv: test-conda-env
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: ${{ inputs.python }}
       - name: Get commit date
@@ -37,7 +40,7 @@ jobs:
           echo "AGE=$AGE" >> $GITHUB_OUTPUT
           echo "AGE in seconds: $AGE"
       - name: Set up Conda environment
-        uses: conda-incubator/setup-miniconda@v4
+        uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb # v4
         with:
           miniconda-version: latest
           activate-environment: ${{ env.condaEnv }}
@@ -66,7 +69,7 @@ jobs:
         name: Run ${{ inputs.mlpackage }} tests
       - name: Upload coverage reports to Codecov with GitHub Action
         if: ${{ steps.get_date.outputs.AGE < 172800 }} # 172800 = 48 * 3600
-        uses: codecov/codecov-action@v7
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
         with:
           env_vars: OS,PYTHON
           fail_ci_if_error: true

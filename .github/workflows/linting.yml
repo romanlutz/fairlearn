@@ -1,5 +1,8 @@
 name: linting
 
+permissions:
+  contents: read
+
 on:
   workflow_call:
     inputs:
@@ -14,22 +17,22 @@ jobs:
   ruff:
     runs-on: ${{ inputs.os }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/ruff-action@v4.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: astral-sh/ruff-action@278981a28ce3188b1e39527901f38254bf3aac89 # v4.1.0
   ruff-format:
     runs-on: ${{ inputs.os }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/ruff-action@v4.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: astral-sh/ruff-action@278981a28ce3188b1e39527901f38254bf3aac89 # v4.1.0
         with:
           version: 0.15.20
           args: "format --check --diff"
   build-wheel:
     runs-on: ${{ inputs.os }}
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
     - name: Set up Python
-      uses: actions/setup-python@v7
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
       with:
         python-version: "3.11"
     - name: Install build

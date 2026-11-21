@@ -1,5 +1,8 @@
 name: OpenML tests
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -26,8 +29,8 @@ jobs:
     env:
       MPLBACKEND: Agg
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: "3.13"
       - run: python scripts/install_requirements.py
@@ -37,7 +40,7 @@ jobs:
         run: python -c "import sklearn; print('version=' + sklearn.__version__)" >> "$GITHUB_OUTPUT"
       - name: Cache OpenML datasets
         id: openml-cache
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: ${{ env.DATA_HOME }}
           key: ${{ runner.os }}-openml-datasets-v2-sklearn-${{ steps.sklearn-version.outputs.version }}-${{ hashFiles('fairlearn/datasets/_fetch_*.py', 'test/unit/datasets/test_datasets.py', 'test/unit/adversarial/test_preprocessing.py', 'test/unit/preprocessing/test_preprocessing_fairness.py', 'test/unit/test_random_state.py') }}
