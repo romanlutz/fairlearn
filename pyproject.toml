@@ -59,6 +59,7 @@ tests = [
 ]
 docs = [
     { include-group = "tests" },
+    # Remove this cap when https://github.com/scikit-learn/scikit-learn/pull/34902 is released.
     "pandas<3.0",
     "pypandoc",
     "sphinx>=8.3.0",
@@ -114,6 +115,13 @@ markers = [
     "mpl_image_compare: tests that require 'pytest-mpl' to be installed",
     "openml: tests that download datasets from OpenML (deselect with '-m \"not openml\"')",
 ]
+
+[tool.coverage.run]
+source = ["fairlearn"]
+relative_files = true
+
+[tool.coverage.paths]
+fairlearn = ["fairlearn", "*/fairlearn"]
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.

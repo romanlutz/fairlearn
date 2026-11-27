@@ -31,15 +31,6 @@ jobs:
         with:
           python-version: ${{ inputs.python }}
       - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
-      - name: Get commit date
-        id: get_date
-        shell: bash
-        run: |
-          COMMIT_DATE=$(git show -s --format=%ct ${{ github.sha }})
-          CURRENT_DATE=$(date +%s)
-          AGE=$((CURRENT_DATE - COMMIT_DATE))
-          echo "AGE=$AGE" >> $GITHUB_OUTPUT
-          echo "AGE in seconds: $AGE"
       - name: Set up Conda environment
         uses: conda-incubator/setup-miniconda@be893c923ea9cf1cf7cd510fbdde27c7e18cbdcb # v4
         with:
@@ -59,7 +50,7 @@ jobs:
           else
             export NUMPY_DEP="numpy"
           fi
-          uv pip install --python python . $NUMPY_DEP
+          uv pip install --system --python "$CONDA_PREFIX/bin/python" . $NUMPY_DEP
         name: Install Fairlearn
       - run: |
           echo
@@ -68,13 +59,13 @@ jobs:
           # Override the filterwarnings set in the TOML file
           python -v -m pytest -o filterwarnings=default --cov=fairlearn --cov-report=xml $baseDir/test_${{inputs.mlpackage}}.py
         name: Run ${{ inputs.mlpackage }} tests
-      - name: Upload coverage reports to Codecov with GitHub Action
-        if: ${{ steps.get_date.outputs.AGE < 172800 }} # 172800 = 48 * 3600
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
+      - name: Retain coverage report
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
-          env_vars: OS,PYTHON
-          fail_ci_if_error: true
-          files: ./coverage.xml
-          flags: unittests
-          name: codecov-umbrella
-          verbose: true
+          name: coverage-line-other-${{ inputs.mlpackage }}-${{ inputs.os }}-${{ inputs.python }}
+          path: |
+            .coverage
+            coverage.xml
+          include-hidden-files: true
+          if-no-files-found: error
+          overwrite: true

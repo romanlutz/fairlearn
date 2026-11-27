@@ -12,6 +12,11 @@ on:
       - "main"
       - "release/**"
   workflow_dispatch:
+    inputs:
+      branch_coverage:
+        description: Collect a separate, non-gating branch coverage baseline
+        type: boolean
+        default: false
 
 
 concurrency:
@@ -66,6 +71,55 @@ jobs:
       os: ${{ matrix.os }}
       python: ${{ matrix.python }}
       mlpackage: ${{ matrix.mlpackage }}
+
+  coverage:
+    needs: [all-deps-min, all-deps, minimal-deps, other-ml]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          pattern: coverage-line-*
+          path: coverage-data
+      - name: Combine complete line coverage
+        run: >
+          uv run --no-project --with coverage python scripts/combine_coverage.py
+          --reports coverage-data
+          --os ubuntu-latest windows-latest macos-15
+          --python 3.13 --min-python 3.11
+          --other-ml lightgbm xgboost tensorflow pytorch
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: coverage-combined-line
+          path: |
+            .coverage
+            coverage.xml
+            coverage.json
+          include-hidden-files: true
+          if-no-files-found: error
+          overwrite: true
+      - name: Upload complete line coverage to Codecov
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
+        with:
+          files: ./coverage.xml
+          disable_search: true
+          fail_ci_if_error: true
+          flags: unittests
+          name: build-test-${{ github.run_id }}-${{ github.run_attempt }}
+
+  branch-coverage:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.branch_coverage }}
+    uses: ./.github/workflows/test-all-deps.yml
+    with:
+      os: ubuntu-latest
+      python: "3.13"
+      codeCovPython: "3.13"
+      coverageBranch: true
 
 
   linting:

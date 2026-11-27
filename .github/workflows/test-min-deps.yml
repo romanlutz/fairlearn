@@ -19,22 +19,11 @@ on:
 jobs:
   all-deps-min:
     # This job installs all dependencies and runs most tests.
-    # CodeCov limits us to 150 uploads per commit id, so have an extra check so
-    # we only upload results if the current commit is under 48 hours old
     runs-on: ${{ inputs.os }}
     env:
       MPLBACKEND: Agg
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - name: Get commit date
-        id: get_date
-        shell: bash
-        run: |
-          COMMIT_DATE=$(git show -s --format=%ct ${{ github.sha }})
-          CURRENT_DATE=$(date +%s)
-          AGE=$((CURRENT_DATE - COMMIT_DATE))
-          echo "AGE=$AGE" >> $GITHUB_OUTPUT
-          echo "AGE in seconds: $AGE"
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
         with:
           python-version: ${{ inputs.python }}
@@ -77,13 +66,14 @@ jobs:
           --mpl-baseline-path='${{ github.workspace }}/test/unit/plot_snapshots'
           --ignore=test/install -m "not openml"
           --cov=fairlearn --cov-report=xml -vl test/
-      - name: Upload coverage reports to Codecov with GitHub Action
-        if: ${{ (inputs.codeCovPython == inputs.python) && (steps.get_date.outputs.AGE < 172800) }} # 172800 = 48 * 3600
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7
+      - name: Retain coverage report
+        if: ${{ inputs.codeCovPython == inputs.python }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
-          env_vars: OS,PYTHON
-          fail_ci_if_error: true
-          files: ./coverage.xml
-          flags: unittests
-          name: codecov-umbrella
-          verbose: true
+          name: coverage-line-min-${{ inputs.os }}-${{ inputs.python }}
+          path: |
+            .coverage
+            coverage.xml
+          include-hidden-files: true
+          if-no-files-found: error
+          overwrite: true
